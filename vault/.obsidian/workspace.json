@@ -1,0 +1,223 @@
+{
+  "main": {
+    "id": "2aac07b6eb2acb8d",
+    "type": "split",
+    "children": [
+      {
+        "id": "ce1d5b89d93ac8b6",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "fe26c236ec7d7a5d",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "5488b2d6e7ffa2ef",
+    "type": "split",
+    "children": [
+      {
+        "id": "9f1e795f724084f7",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "8468a1ba47569e7a",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "3d6c00fb79b05bbe",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "eb5338aa621785ad",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "22821f2a8f846de4",
+    "type": "split",
+    "children": [
+      {
+        "id": "e8bb4d4f24790c16",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f4e928ec72032686",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "52f2ac7c9b76889c",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "bf24a344b2cff493",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "68addd4bb9ed130f",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "cc59155b7e2c9c8b",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 200,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "fe26c236ec7d7a5d",
+  "lastOpenFiles": [
+    "codemaps/ai-unify-companion/mcp_server/tools/tools.md",
+    "codemaps/ai-unify-companion/unify_api/datasets.md",
+    "project/docs/spec_summary.md",
+    "codemaps/ai-unify-companion/workflow_reader/__init__.md",
+    "codemaps/ai-unify-companion/workflow_reader/tree_helpers.md",
+    "codemaps/ai-unify-companion/workflow_reader/upload.md",
+    "codemaps/ai-unify-companion/workflow_reader/traversal.md",
+    "codemaps/ai-unify-companion/workflow_reader/reader.md",
+    "codemaps/ai-unify-companion/workflow_reader/loader.md",
+    "codemaps/ai-unify-companion/workflow_reader/inspect.md",
+    "codemaps/ai-unify-companion/workflow_reader/context.md",
+    "codemaps/ai-unify-companion/workflow_reader/constants.md",
+    "codemaps/ai-unify-companion/workflow_reader/activity_map.md",
+    "codemaps/ai-unify-companion/workflow_reader",
+    "codemaps/ai-unify-companion/unify_api/__init__.md",
+    "codemaps/ai-unify-companion/unify_api/_mcp_helpers.md",
+    "codemaps/ai-unify-companion/unify_api/protocol.md",
+    "codemaps/ai-unify-companion/unify_api/workflows.md",
+    "codemaps/ai-unify-companion/unify_api/models.md",
+    "codemaps/ai-unify-companion/unify_api/jobs.md",
+    "codemaps/ai-unify-companion/unify_api/explore.md",
+    "codemaps/ai-unify-companion/unify_api/core.md",
+    "codemaps/ai-unify-companion/unify_api/connect.md",
+    "codemaps/ai-unify-companion/unify_api/constants.md",
+    "codemaps/ai-unify-companion/unify_api/auth.md",
+    "codemaps/ai-unify-companion/unify_api/config.md",
+    "codemaps/ai-unify-companion/unify_api/activity_details.md",
+    "codemaps/ai-unify-companion/unify_api",
+    "codemaps/ai-unify-companion/mcp_server/tools",
+    "codemaps/ai-unify-companion/mcp_server",
+    "codemaps/ai-unify-companion/unify_jobs_debug",
+    "codemaps/ai-unify-companion/activities",
+    "codemaps/ai-unify-companion/codemap-index.jsonl",
+    "codemaps/ai-unify-companion",
+    "codemaps",
+    "wiki"
+  ]
+}
