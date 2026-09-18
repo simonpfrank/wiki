@@ -4,17 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "ce1d5b89d93ac8b6",
+        "id": "1c784a5e7794c871",
         "type": "tabs",
         "children": [
           {
-            "id": "fe26c236ec7d7a5d",
+            "id": "18f8b23918f34353",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "type": "markdown",
+              "state": {
+                "file": "codemaps/_mockup-excel-runner/concepts/concept-action-registry.md",
+                "mode": "preview",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "concept-action-registry"
             }
           }
         ]
@@ -181,43 +185,43 @@
       "bases:Create new base": false
     }
   },
-  "active": "fe26c236ec7d7a5d",
+  "active": "18f8b23918f34353",
   "lastOpenFiles": [
-    "codemaps/ai-unify-companion/mcp_server/tools/tools.md",
-    "codemaps/ai-unify-companion/unify_api/datasets.md",
-    "project/docs/spec_summary.md",
-    "codemaps/ai-unify-companion/workflow_reader/__init__.md",
-    "codemaps/ai-unify-companion/workflow_reader/tree_helpers.md",
-    "codemaps/ai-unify-companion/workflow_reader/upload.md",
-    "codemaps/ai-unify-companion/workflow_reader/traversal.md",
-    "codemaps/ai-unify-companion/workflow_reader/reader.md",
-    "codemaps/ai-unify-companion/workflow_reader/loader.md",
-    "codemaps/ai-unify-companion/workflow_reader/inspect.md",
-    "codemaps/ai-unify-companion/workflow_reader/context.md",
-    "codemaps/ai-unify-companion/workflow_reader/constants.md",
-    "codemaps/ai-unify-companion/workflow_reader/activity_map.md",
+    "codemaps/_mockup-excel-runner/concepts/concept-action-registry.md",
+    "codemaps/_mockup-excel-runner/concepts/concept-scratch-commit.md",
+    "codemaps/_mockup-excel-runner/concepts/concept-session.md",
+    "codemaps/_mockup-excel-runner/concepts",
+    "codemaps/_mockup-excel-runner/reference/mod-actions.md",
+    "codemaps/_mockup-excel-runner/reference/mod-backends.md",
+    "codemaps/_mockup-excel-runner/reference/mod-engine.md",
+    "codemaps/_mockup-excel-runner/reference/mod-core.md",
+    "codemaps/_mockup-excel-runner/reference/mod-runner.md",
+    "codemaps/_mockup-excel-runner/reference/mod-cli.md",
+    "codemaps/_mockup-excel-runner/reference",
+    "codemaps/_mockup-excel-runner/route-run-a-workflow/r6-commit-and-audit.md",
+    "codemaps/_mockup-excel-runner/route-run-a-workflow/r5-execute-each-step.md",
+    "codemaps/_mockup-excel-runner/route-run-a-workflow/r4-prepare-the-run.md",
+    "codemaps/_mockup-excel-runner/route-run-a-workflow/r3-validate.md",
+    "codemaps/_mockup-excel-runner/route-run-a-workflow/r2-load-the-workflow.md",
+    "codemaps/_mockup-excel-runner/route-run-a-workflow/r1-you-run-the-command.md",
+    "codemaps/_mockup-excel-runner/route-run-a-workflow",
+    "codemaps/_mockup-excel-runner/start-here.md",
+    "codemaps/_mockup-excel-runner",
+    "codemaps/_graph-experiments/2-tree/01-run-workflow.md",
+    "codemaps/_graph-experiments/2-tree/02b-validate.md",
+    "codemaps/_graph-experiments/2-tree/02a-load.md",
+    "codemaps/_graph-experiments/2-tree/03b-resolve-templates.md",
+    "codemaps/_graph-experiments/2-tree/03a-parse-yaml.md",
+    "codemaps/_graph-experiments/3-hub/hub-06-commit-and-audit.md",
+    "codemaps/_graph-experiments/3-hub/hub-05-execute-the-steps.md",
+    "codemaps/_graph-experiments/3-hub/hub-04-validate.md",
+    "codemaps/_graph-experiments/3-hub/hub-03-load-the-workflow.md",
+    "codemaps/_graph-experiments/3-hub/hub-02-parse-arguments.md",
+    "codemaps/_graph-experiments/3-hub",
+    "codemaps/_graph-experiments/2-tree",
+    "codemaps/_graph-experiments/1-chain",
+    "codemaps/_graph-experiments",
     "codemaps/ai-unify-companion/workflow_reader",
-    "codemaps/ai-unify-companion/unify_api/__init__.md",
-    "codemaps/ai-unify-companion/unify_api/_mcp_helpers.md",
-    "codemaps/ai-unify-companion/unify_api/protocol.md",
-    "codemaps/ai-unify-companion/unify_api/workflows.md",
-    "codemaps/ai-unify-companion/unify_api/models.md",
-    "codemaps/ai-unify-companion/unify_api/jobs.md",
-    "codemaps/ai-unify-companion/unify_api/explore.md",
-    "codemaps/ai-unify-companion/unify_api/core.md",
-    "codemaps/ai-unify-companion/unify_api/connect.md",
-    "codemaps/ai-unify-companion/unify_api/constants.md",
-    "codemaps/ai-unify-companion/unify_api/auth.md",
-    "codemaps/ai-unify-companion/unify_api/config.md",
-    "codemaps/ai-unify-companion/unify_api/activity_details.md",
-    "codemaps/ai-unify-companion/unify_api",
-    "codemaps/ai-unify-companion/mcp_server/tools",
-    "codemaps/ai-unify-companion/mcp_server",
-    "codemaps/ai-unify-companion/unify_jobs_debug",
-    "codemaps/ai-unify-companion/activities",
-    "codemaps/ai-unify-companion/codemap-index.jsonl",
-    "codemaps/ai-unify-companion",
-    "codemaps",
-    "wiki"
+    "codemaps/ai-unify-companion/unify_api"
   ]
 }
