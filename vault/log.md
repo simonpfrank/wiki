@@ -2,6 +2,16 @@
 
 Append-only, newest-first. Fixed prefix per entry so `grep "^## \[" log.md` works.
 
+## [2026-09-18] note | Orientation experiments handed over mid-thread
+
+Built `tools/orient/orient.py` (v0, disposable), the `_graph-experiments`
+topology tests, and a hand-written `_mockup-excel-runner`. Findings: Obsidian's
+graph view can never show hierarchy or order; the hairball is our own link
+density; AST gives structure but not significance; the judgement-carrying pages
+(concepts, layering) are not generatable. Full state in
+[wiki/handover-codemap-orientation.md](wiki/handover-codemap-orientation.md).
+PRD §13.5 and §13 point 2 now need revisiting.
+
 ## [2026-09-17] decision | JSONL codemap-index schema specced
 
 Locked the exact record shape: `module` (file-level) and `function/class/method`

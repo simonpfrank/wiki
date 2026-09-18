@@ -187,6 +187,7 @@
   },
   "active": "18f8b23918f34353",
   "lastOpenFiles": [
+    "wiki/handover-codemap-orientation.md",
     "codemaps/_mockup-excel-runner/concepts/concept-action-registry.md",
     "codemaps/_mockup-excel-runner/concepts/concept-scratch-commit.md",
     "codemaps/_mockup-excel-runner/concepts/concept-session.md",
@@ -216,7 +217,6 @@
     "codemaps/_graph-experiments/3-hub/hub-05-execute-the-steps.md",
     "codemaps/_graph-experiments/3-hub/hub-04-validate.md",
     "codemaps/_graph-experiments/3-hub/hub-03-load-the-workflow.md",
-    "codemaps/_graph-experiments/3-hub/hub-02-parse-arguments.md",
     "codemaps/_graph-experiments/3-hub",
     "codemaps/_graph-experiments/2-tree",
     "codemaps/_graph-experiments/1-chain",

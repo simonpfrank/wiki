@@ -30,8 +30,19 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 SKIP_DIRS = {
-    ".git", ".venv", "venv", "env", "__pycache__", ".mypy_cache", ".pytest_cache",
-    ".ruff_cache", "build", "dist", "node_modules", ".tox", "site-packages",
+    ".git",
+    ".venv",
+    "venv",
+    "env",
+    "__pycache__",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    "build",
+    "dist",
+    "node_modules",
+    ".tox",
+    "site-packages",
 }
 
 MAX_TRACE_DEPTH = 4
@@ -43,9 +54,10 @@ TOP_FILES_SHOWN = 8
 # model
 # --------------------------------------------------------------------------
 
+
 @dataclass
 class Symbol:
-    kind: str                 # function | class | method
+    kind: str  # function | class | method
     name: str
     anchor: str
     module: str
@@ -88,14 +100,15 @@ class Module:
 
 @dataclass
 class EntryPoint:
-    label: str        # how you invoke it
-    anchor: str       # symbol/module anchor it lands on ("" if unresolved)
-    evidence: str     # where we learned this
+    label: str  # how you invoke it
+    anchor: str  # symbol/module anchor it lands on ("" if unresolved)
+    evidence: str  # where we learned this
 
 
 # --------------------------------------------------------------------------
 # discovery
 # --------------------------------------------------------------------------
+
 
 def find_python_files(repo: Path) -> list[Path]:
     out: list[Path] = []
@@ -134,7 +147,9 @@ def signature_of(node: ast.FunctionDef | ast.AsyncFunctionDef) -> str:
     return f"{prefix} {node.name}({args}){returns}"
 
 
-def decorator_names(node: ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef) -> list[str]:
+def decorator_names(
+    node: ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef,
+) -> list[str]:
     names = []
     for d in node.decorator_list:
         try:
@@ -147,6 +162,7 @@ def decorator_names(node: ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef)
 # --------------------------------------------------------------------------
 # parse
 # --------------------------------------------------------------------------
+
 
 def parse_module(repo: Path, file_path: Path) -> Module:
     rel = file_path.relative_to(repo)
@@ -182,7 +198,9 @@ def parse_module(repo: Path, file_path: Path) -> Module:
                 all_targets.add(alias.name)
         elif isinstance(node, ast.ImportFrom):
             if node.level and node.level > 0:
-                base = ".".join(name.split(".")[: max(0, len(name.split(".")) - node.level + 1)])
+                base = ".".join(
+                    name.split(".")[: max(0, len(name.split(".")) - node.level + 1)]
+                )
                 target_mod = f"{base}.{node.module}" if node.module else base
             else:
                 target_mod = node.module or ""
@@ -215,43 +233,65 @@ def parse_module(repo: Path, file_path: Path) -> Module:
     # --- symbols ----------------------------------------------------------
     for node in tree.body:
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            mod.symbols.append(Symbol(
-                kind="function", name=node.name, anchor=f"{name}.{node.name}",
-                module=name, path=mod.path, line=node.lineno,
-                signature=signature_of(node),
-                summary=first_line(ast.get_docstring(node, clean=True)),
-                decorators=decorator_names(node),
-            ))
+            mod.symbols.append(
+                Symbol(
+                    kind="function",
+                    name=node.name,
+                    anchor=f"{name}.{node.name}",
+                    module=name,
+                    path=mod.path,
+                    line=node.lineno,
+                    signature=signature_of(node),
+                    summary=first_line(ast.get_docstring(node, clean=True)),
+                    decorators=decorator_names(node),
+                )
+            )
             mod.symbols[-1]._node = node  # type: ignore[attr-defined]
         elif isinstance(node, ast.ClassDef):
             cls_anchor = f"{name}.{node.name}"
             bases = ", ".join(ast.unparse(b) for b in node.bases) if node.bases else ""
-            mod.symbols.append(Symbol(
-                kind="class", name=node.name, anchor=cls_anchor, module=name,
-                path=mod.path, line=node.lineno,
-                signature=f"class {node.name}({bases})" if bases else f"class {node.name}",
-                summary=first_line(ast.get_docstring(node, clean=True)),
-                decorators=decorator_names(node),
-                is_data_type=looks_like_data_type(node),
-            ))
+            mod.symbols.append(
+                Symbol(
+                    kind="class",
+                    name=node.name,
+                    anchor=cls_anchor,
+                    module=name,
+                    path=mod.path,
+                    line=node.lineno,
+                    signature=(
+                        f"class {node.name}({bases})" if bases else f"class {node.name}"
+                    ),
+                    summary=first_line(ast.get_docstring(node, clean=True)),
+                    decorators=decorator_names(node),
+                    is_data_type=looks_like_data_type(node),
+                )
+            )
             mod.symbols[-1]._node = node  # type: ignore[attr-defined]
             for sub in node.body:
                 if isinstance(sub, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                    mod.symbols.append(Symbol(
-                        kind="method", name=f"{node.name}.{sub.name}",
-                        anchor=f"{cls_anchor}.{sub.name}", module=name,
-                        path=mod.path, line=sub.lineno,
-                        signature=signature_of(sub),
-                        summary=first_line(ast.get_docstring(sub, clean=True)),
-                        decorators=decorator_names(sub),
-                    ))
+                    mod.symbols.append(
+                        Symbol(
+                            kind="method",
+                            name=f"{node.name}.{sub.name}",
+                            anchor=f"{cls_anchor}.{sub.name}",
+                            module=name,
+                            path=mod.path,
+                            line=sub.lineno,
+                            signature=signature_of(sub),
+                            summary=first_line(ast.get_docstring(sub, clean=True)),
+                            decorators=decorator_names(sub),
+                        )
+                    )
                     mod.symbols[-1]._node = sub  # type: ignore[attr-defined]
                     mod.symbols[-1]._class = node.name  # type: ignore[attr-defined]
         else:
             if isinstance(node, ast.If):
                 test = node.test
-                if (isinstance(test, ast.Compare) and isinstance(test.left, ast.Name)
-                        and test.left.id == "__name__"):
+                if (
+                    isinstance(test, ast.Compare)
+                    and isinstance(test.left, ast.Name)
+                    and test.left.id == "__name__"
+                ):
                     mod.has_main_guard = True
 
     mod._tree = tree  # type: ignore[attr-defined]
@@ -261,6 +301,7 @@ def parse_module(repo: Path, file_path: Path) -> Module:
 # --------------------------------------------------------------------------
 # call resolution
 # --------------------------------------------------------------------------
+
 
 def call_targets(node: ast.AST) -> list[tuple[str | None, str]]:
     """(receiver, attr_or_name) for every call in a node's body, in source order.
@@ -287,7 +328,15 @@ def call_targets(node: ast.AST) -> list[tuple[str | None, str]]:
     return [(r, a) for _, _, r, a in found]
 
 
-DATA_BASE_HINTS = ("Error", "Exception", "Enum", "BaseModel", "TypedDict", "NamedTuple", "Protocol")
+DATA_BASE_HINTS = (
+    "Error",
+    "Exception",
+    "Enum",
+    "BaseModel",
+    "TypedDict",
+    "NamedTuple",
+    "Protocol",
+)
 
 
 def looks_like_data_type(node: ast.ClassDef) -> bool:
@@ -327,7 +376,9 @@ def resolve_calls(modules: dict[str, Module]) -> None:
         mbind = mod._module_bindings  # type: ignore[attr-defined]
         sbind = mod._symbol_bindings  # type: ignore[attr-defined]
 
-        def resolve(recv: str | None, attr: str, owner_class: str | None) -> tuple[str | None, bool]:
+        def resolve(
+            recv: str | None, attr: str, owner_class: str | None
+        ) -> tuple[str | None, bool]:
             # 1. plain name, defined in this file
             if recv is None:
                 if attr in local:
@@ -370,8 +421,13 @@ def resolve_calls(modules: dict[str, Module]) -> None:
 
         # module-level (top-of-file / __main__ guard) calls
         body_only = ast.Module(
-            body=[n for n in mod._tree.body  # type: ignore[attr-defined]
-                  if not isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))],
+            body=[
+                n
+                for n in mod._tree.body  # type: ignore[attr-defined]
+                if not isinstance(
+                    n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+                )
+            ],
             type_ignores=[],
         )
         for recv, attr in call_targets(body_only):
@@ -412,6 +468,7 @@ def resolve_calls(modules: dict[str, Module]) -> None:
 # entry points — question 1
 # --------------------------------------------------------------------------
 
+
 def find_entry_points(repo: Path, modules: dict[str, Module]) -> list[EntryPoint]:
     eps: list[EntryPoint] = []
 
@@ -422,30 +479,40 @@ def find_entry_points(repo: Path, modules: dict[str, Module]) -> list[EntryPoint
         for cmd, target in scripts.items():
             mod_part, _, fn = target.partition(":")
             anchor = f"{mod_part}.{fn}" if fn else mod_part
-            eps.append(EntryPoint(
-                label=f"{cmd} ...",
-                anchor=anchor,
-                evidence="pyproject.toml [project.scripts]",
-            ))
+            eps.append(
+                EntryPoint(
+                    label=f"{cmd} ...",
+                    anchor=anchor,
+                    evidence="pyproject.toml [project.scripts]",
+                )
+            )
 
     for name, mod in modules.items():
         if mod.path.endswith("__main__.py"):
             pkg = name.rsplit(".", 1)[0] if "." in name else name
             anchor = next(iter(mod.module_calls), name)
-            eps.append(EntryPoint(
-                label=f"python -m {pkg}",
-                anchor=anchor,
-                evidence=f"{mod.path} exists",
-            ))
+            eps.append(
+                EntryPoint(
+                    label=f"python -m {pkg}",
+                    anchor=anchor,
+                    evidence=f"{mod.path} exists",
+                )
+            )
         elif mod.has_main_guard and not mod.is_test:
-            eps.append(EntryPoint(
-                label=f"python {mod.path}",
-                anchor=next(iter(mod.module_calls), name),
-                evidence=f'`if __name__ == "__main__":` in {mod.path}',
-            ))
+            eps.append(
+                EntryPoint(
+                    label=f"python {mod.path}",
+                    anchor=next(iter(mod.module_calls), name),
+                    evidence=f'`if __name__ == "__main__":` in {mod.path}',
+                )
+            )
 
     # library entry: top-level package __all__
-    pkgs = [m for m in modules.values() if m.path.endswith("__init__.py") and "." not in m.name]
+    pkgs = [
+        m
+        for m in modules.values()
+        if m.path.endswith("__init__.py") and "." not in m.name
+    ]
     for pkg in pkgs:
         for exported in pkg.exports:
             anchor = None
@@ -456,15 +523,19 @@ def find_entry_points(repo: Path, modules: dict[str, Module]) -> list[EntryPoint
                         break
                 if anchor:
                     break
-            eps.append(EntryPoint(
-                label=f"from {pkg.name} import {exported}",
-                anchor=anchor or "",
-                evidence=f"__all__ in {pkg.path}",
-            ))
+            eps.append(
+                EntryPoint(
+                    label=f"from {pkg.name} import {exported}",
+                    anchor=anchor or "",
+                    evidence=f"__all__ in {pkg.path}",
+                )
+            )
     return eps
 
 
-def cli_arguments(repo: Path, modules: dict[str, Module], anchor: str) -> list[tuple[str, str]]:
+def cli_arguments(
+    repo: Path, modules: dict[str, Module], anchor: str
+) -> list[tuple[str, str]]:
     """Pull `parser.add_argument(...)` out of the entry module, so the
     'how do I run it' answer includes the actual arguments, not just a command."""
     mod_name = anchor.rsplit(".", 1)[0]
@@ -473,8 +544,11 @@ def cli_arguments(repo: Path, modules: dict[str, Module], anchor: str) -> list[t
         return []
     args: list[tuple[str, str]] = []
     for node in ast.walk(mod._tree):  # type: ignore[attr-defined]
-        if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
-                and node.func.attr == "add_argument"):
+        if (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr == "add_argument"
+        ):
             flag = ""
             if node.args and isinstance(node.args[0], ast.Constant):
                 flag = str(node.args[0].value)
@@ -497,7 +571,9 @@ def readme_commands(repo: Path) -> list[str]:
         return []
     text = readme.read_text(encoding="utf-8", errors="replace")
     cmds: list[str] = []
-    for block in re.findall(r"```(?:bash|sh|shell|console|powershell)?\n(.*?)```", text, re.S):
+    for block in re.findall(
+        r"```(?:bash|sh|shell|console|powershell)?\n(.*?)```", text, re.S
+    ):
         for ln in block.splitlines():
             ln = ln.strip().lstrip("$ ").strip()
             if ln.startswith(("python", "pip", "uv ", "poetry")) or "-runner" in ln:
@@ -514,7 +590,10 @@ def readme_commands(repo: Path) -> list[str]:
 # reachability — question 2
 # --------------------------------------------------------------------------
 
-def classify(modules: dict[str, Module], entries: list[EntryPoint]) -> dict[str, set[str]]:
+
+def classify(
+    modules: dict[str, Module], entries: list[EntryPoint]
+) -> dict[str, set[str]]:
     edges: dict[str, set[str]] = {}
     for m in modules.values():
         edges[m.name] = set(m.module_calls)
@@ -523,7 +602,8 @@ def classify(modules: dict[str, Module], entries: list[EntryPoint]) -> dict[str,
             # a class being reachable makes its methods reachable
             if s.kind == "class":
                 edges[s.anchor] |= {
-                    o.anchor for o in m.symbols
+                    o.anchor
+                    for o in m.symbols
                     if o.kind == "method" and o.anchor.startswith(s.anchor + ".")
                 }
 
@@ -552,8 +632,18 @@ def classify(modules: dict[str, Module], entries: list[EntryPoint]) -> dict[str,
             continue
         for s in m.symbols:
             if s.decorators and any(
-                not d.startswith(("property", "staticmethod", "classmethod", "abstractmethod",
-                                  "dataclass", "override", "functools", "cached_property"))
+                not d.startswith(
+                    (
+                        "property",
+                        "staticmethod",
+                        "classmethod",
+                        "abstractmethod",
+                        "dataclass",
+                        "override",
+                        "functools",
+                        "cached_property",
+                    )
+                )
                 for d in s.decorators
             ):
                 registered.add(s.anchor)
@@ -593,7 +683,10 @@ def classify(modules: dict[str, Module], entries: list[EntryPoint]) -> dict[str,
 # markdown emit
 # --------------------------------------------------------------------------
 
-def anchor_link(target: str, modules: dict[str, Module], from_module: str | None) -> str:
+
+def anchor_link(
+    target: str, modules: dict[str, Module], from_module: str | None
+) -> str:
     """Markdown link to a symbol anchor, as seen from a module page (or root)."""
     mod_name = target
     while mod_name and mod_name not in modules:
@@ -602,7 +695,7 @@ def anchor_link(target: str, modules: dict[str, Module], from_module: str | None
         mod_name = mod_name.rsplit(".", 1)[0]
     if not mod_name:
         return f"`{target}`"
-    heading = target[len(mod_name) + 1:]
+    heading = target[len(mod_name) + 1 :]
     short = heading or mod_name
     if from_module == mod_name and heading:
         return f"[{short}](#{heading})"
@@ -619,7 +712,11 @@ def build_trace(root: str, modules: dict[str, Module]) -> list[str]:
 
     def children_of(anchor: str) -> list[str]:
         sym = index.get(anchor)
-        raw = sym.call_order if sym else modules[anchor].module_call_order if anchor in modules else []
+        raw = (
+            sym.call_order
+            if sym
+            else modules[anchor].module_call_order if anchor in modules else []
+        )
         out = []
         for c in raw:
             target = index.get(c)
@@ -641,25 +738,38 @@ def build_trace(root: str, modules: dict[str, Module]) -> list[str]:
         children = children_of(anchor)
         if depth >= MAX_TRACE_DEPTH:
             if children:
-                lines.append("  " * (depth + 1) +
-                             f"- _\u2026 {len(children)} more level(s) below — open the page to continue_")
+                lines.append(
+                    "  " * (depth + 1)
+                    + f"- _\u2026 {len(children)} more level(s) below — open the page to continue_"
+                )
             return
         for child in children[:MAX_CHILDREN_PER_NODE]:
             walk(child, depth + 1)
         if len(children) > MAX_CHILDREN_PER_NODE:
-            lines.append("  " * (depth + 1) +
-                         f"- _(+{len(children) - MAX_CHILDREN_PER_NODE} more, not shown)_")
+            lines.append(
+                "  " * (depth + 1)
+                + f"- _(+{len(children) - MAX_CHILDREN_PER_NODE} more, not shown)_"
+            )
 
     walk(root, 0)
     if skipped_types:
-        lines += ["", f"_Data types / exceptions constructed along the way (omitted from the route): "
-                      + ", ".join(f"`{t.rsplit('.', 1)[-1]}`" for t in sorted(skipped_types)) + "._"]
+        lines += [
+            "",
+            f"_Data types / exceptions constructed along the way (omitted from the route): "
+            + ", ".join(f"`{t.rsplit('.', 1)[-1]}`" for t in sorted(skipped_types))
+            + "._",
+        ]
     return lines
 
 
-def write_start_here(out: Path, repo: Path, modules: dict[str, Module],
-                     entries: list[EntryPoint], traces: list[tuple[str, str]],
-                     test_count: int = 0) -> None:
+def write_start_here(
+    out: Path,
+    repo: Path,
+    modules: dict[str, Module],
+    entries: list[EntryPoint],
+    traces: list[tuple[str, str]],
+    test_count: int = 0,
+) -> None:
     pyproject = repo / "pyproject.toml"
     desc = ""
     if pyproject.exists():
@@ -669,8 +779,11 @@ def write_start_here(out: Path, repo: Path, modules: dict[str, Module],
     L: list[str] = [f"# Start here — `{repo.name}`", ""]
     if desc:
         L += [f"> {desc}", ""]
-    L += ["_Generated orientation map (experiment v0). Everything below is derived from the "
-          "source — treat `INFERRED`/`ambiguous` markings as hints, not facts._", ""]
+    L += [
+        "_Generated orientation map (experiment v0). Everything below is derived from the "
+        "source — treat `INFERRED`/`ambiguous` markings as hints, not facts._",
+        "",
+    ]
 
     # Q1
     L += ["## 1. How do I run it", ""]
@@ -678,7 +791,9 @@ def write_start_here(out: Path, repo: Path, modules: dict[str, Module],
     if runnable:
         L += ["| Command | Lands on | How we know |", "|---|---|---|"]
         for e in runnable:
-            L.append(f"| `{e.label}` | {anchor_link(e.anchor, modules, None) if e.anchor else '—'} | {e.evidence} |")
+            L.append(
+                f"| `{e.label}` | {anchor_link(e.anchor, modules, None) if e.anchor else '—'} | {e.evidence} |"
+            )
         L.append("")
     for e in runnable:
         args = cli_arguments(repo, modules, e.anchor) if e.anchor else []
@@ -691,82 +806,124 @@ def write_start_here(out: Path, repo: Path, modules: dict[str, Module],
             break
     cmds = readme_commands(repo)
     if cmds:
-        L += ["**Commands found in the README:**", ""] + [f"- `{c}`" for c in cmds] + [""]
+        L += (
+            ["**Commands found in the README:**", ""]
+            + [f"- `{c}`" for c in cmds]
+            + [""]
+        )
 
     lib = [e for e in entries if e.label.startswith("from ")]
     if lib:
-        L += ["**Or use it as a library** (public API — the only names the package promises):", ""]
+        L += [
+            "**Or use it as a library** (public API — the only names the package promises):",
+            "",
+        ]
         for e in lib:
-            L.append(f"- `{e.label}` → {anchor_link(e.anchor, modules, None) if e.anchor else '_unresolved_'}")
+            L.append(
+                f"- `{e.label}` → {anchor_link(e.anchor, modules, None) if e.anchor else '_unresolved_'}"
+            )
         L.append("")
 
     # Q4
     if traces:
         L += ["## 2. What happens when it runs", ""]
         for label, fname in traces:
-            L.append(f"- [{label}]({fname}) — bounded call trace, depth {MAX_TRACE_DEPTH}")
+            L.append(
+                f"- [{label}]({fname}) — bounded call trace, depth {MAX_TRACE_DEPTH}"
+            )
         L.append("")
 
     # Q3
     src = [m for m in modules.values() if not m.is_test]
-    ranked = sorted(src, key=lambda m: (
-        0 if m.status in ("live",) else 1,
-        -len(m.imported_by),
-        -m.line_count,
-    ))
-    L += ["## 3. The files that matter", "",
-          "Ranked by: reachable from an entry point, then how many *other source* modules "
-          "import it (test importers counted separately — they inflate everything), then "
-          "size. Blunt on purpose — it is a starting order, not a truth.", "",
-          "| # | Module | Lines | Used by (src) | Used by (tests) | Status | What it's for |",
-          "|---|---|---|---|---|---|---|"]
+    ranked = sorted(
+        src,
+        key=lambda m: (
+            0 if m.status in ("live",) else 1,
+            -len(m.imported_by),
+            -m.line_count,
+        ),
+    )
+    L += [
+        "## 3. The files that matter",
+        "",
+        "Ranked by: reachable from an entry point, then how many *other source* modules "
+        "import it (test importers counted separately — they inflate everything), then "
+        "size. Blunt on purpose — it is a starting order, not a truth.",
+        "",
+        "| # | Module | Lines | Used by (src) | Used by (tests) | Status | What it's for |",
+        "|---|---|---|---|---|---|---|",
+    ]
     for i, m in enumerate(ranked[:TOP_FILES_SHOWN], 1):
         role = m.role or "_(no module docstring)_"
         if len(role) > 110:
             role = role[:107] + "..."
-        L.append(f"| {i} | [{m.name}](modules/{m.doc_name}) | {m.line_count} | "
-                 f"{len(m.imported_by)} | {len(m.imported_by_tests)} | {m.status} | {role} |")
+        L.append(
+            f"| {i} | [{m.name}](modules/{m.doc_name}) | {m.line_count} | "
+            f"{len(m.imported_by)} | {len(m.imported_by_tests)} | {m.status} | {role} |"
+        )
     L.append("")
     if len(ranked) > TOP_FILES_SHOWN:
-        L += [f"<details><summary>The other {len(ranked) - TOP_FILES_SHOWN} module(s)</summary>", ""]
+        L += [
+            f"<details><summary>The other {len(ranked) - TOP_FILES_SHOWN} module(s)</summary>",
+            "",
+        ]
         for m in ranked[TOP_FILES_SHOWN:]:
-            L.append(f"- [{m.name}](modules/{m.doc_name}) — {m.line_count} lines, {m.status}")
+            L.append(
+                f"- [{m.name}](modules/{m.doc_name}) — {m.line_count} lines, {m.status}"
+            )
         L += ["", "</details>", ""]
 
     # Q2
     counts: dict[str, int] = {}
     for m in src:
         counts[m.status] = counts.get(m.status, 0) + 1
-    L += ["## 4. What's real and what can I ignore", "",
-          "  ".join(f"**{k}**: {v}" for k, v in sorted(counts.items())), "",
-          "See [liveness](liveness.md) for the per-symbol breakdown and the caveats "
-          "(this is the least trustworthy page here — read the caveats).", ""]
+    L += [
+        "## 4. What's real and what can I ignore",
+        "",
+        "  ".join(f"**{k}**: {v}" for k, v in sorted(counts.items())),
+        "",
+        "See [liveness](liveness.md) for the per-symbol breakdown and the caveats "
+        "(this is the least trustworthy page here — read the caveats).",
+        "",
+    ]
     if test_count:
-        L += [f"_{test_count} test module(s) were read (so \"only tests call this\" is still "
-              f"detected) but deliberately not given pages — rerun with `--include-tests` "
-              f"if you want them._", ""]
+        L += [
+            f'_{test_count} test module(s) were read (so "only tests call this" is still '
+            f"detected) but deliberately not given pages — rerun with `--include-tests` "
+            f"if you want them._",
+            "",
+        ]
 
     # Q5
     biggest = sorted(src, key=lambda m: -m.line_count)[:3]
     L += ["## 5. The big files (start inside them, not at the top)", ""]
     for m in biggest:
-        live_syms = sum(1 for s in m.symbols if s.status in ("live", "entry", "registered"))
-        L.append(f"- [{m.name}](modules/{m.doc_name}) — {m.line_count} lines, "
-                 f"{len(m.symbols)} symbols ({live_syms} reached). "
-                 f"Its page opens with a what's-in-here map.")
+        live_syms = sum(
+            1 for s in m.symbols if s.status in ("live", "entry", "registered")
+        )
+        L.append(
+            f"- [{m.name}](modules/{m.doc_name}) — {m.line_count} lines, "
+            f"{len(m.symbols)} symbols ({live_syms} reached). "
+            f"Its page opens with a what's-in-here map."
+        )
     L.append("")
 
     (out / "start-here.md").write_text("\n".join(L) + "\n", encoding="utf-8")
 
 
 def write_liveness(out: Path, modules: dict[str, Module]) -> None:
-    L = ["# Liveness — what's actually used", "",
-         "[Start here](start-here.md)", "",
-         "> **Caveats, read these first.** This is computed by following calls from the "
-         "entry points, and Python defeats that in normal, non-suspicious ways: decorator "
-         "registration, dynamic dispatch, callbacks held in dicts, `getattr`, plugin loading. "
-         "`unreached` means *we could not find a caller*, **not** *it is dead*. Treat it as "
-         "a list of things worth asking about.", ""]
+    L = [
+        "# Liveness — what's actually used",
+        "",
+        "[Start here](start-here.md)",
+        "",
+        "> **Caveats, read these first.** This is computed by following calls from the "
+        "entry points, and Python defeats that in normal, non-suspicious ways: decorator "
+        "registration, dynamic dispatch, callbacks held in dicts, `getattr`, plugin loading. "
+        "`unreached` means *we could not find a caller*, **not** *it is dead*. Treat it as "
+        "a list of things worth asking about.",
+        "",
+    ]
     buckets: dict[str, list[Symbol]] = {}
     for m in modules.values():
         if m.is_test:
@@ -779,9 +936,9 @@ def write_liveness(out: Path, modules: dict[str, Module]) -> None:
         "entry": "Where execution starts.",
         "live": "Reachable by following calls from an entry point.",
         "registered": "Reached only via a decorator — almost certainly a registration/plugin "
-                      "mechanism. Real, but invisible to call-following.",
+        "mechanism. Real, but invisible to call-following.",
         "test-only": "No caller in the source; only tests reach it. Could be genuinely "
-                     "internal, could be leftover.",
+        "internal, could be leftover.",
         "unreached": "No caller found anywhere. Worth asking about — see caveats.",
     }
     for status in order:
@@ -796,18 +953,29 @@ def write_liveness(out: Path, modules: dict[str, Module]) -> None:
 
 
 def write_module_page(out: Path, mod: Module, modules: dict[str, Module]) -> None:
-    L = [f"# {mod.name}", "",
-         f"[Start here](../start-here.md) › `{mod.path}` · {mod.line_count} lines · "
-         f"**{mod.status}**", ""]
+    L = [
+        f"# {mod.name}",
+        "",
+        f"[Start here](../start-here.md) › `{mod.path}` · {mod.line_count} lines · "
+        f"**{mod.status}**",
+        "",
+    ]
     if mod.role:
         L += [f"> {mod.role}", ""]
 
     if mod.symbols:
-        L += ["## What's in here", "", "| Line | Symbol | Kind | Status | One-liner |", "|---|---|---|---|---|"]
+        L += [
+            "## What's in here",
+            "",
+            "| Line | Symbol | Kind | Status | One-liner |",
+            "|---|---|---|---|---|",
+        ]
         for s in mod.symbols:
-            heading = s.anchor[len(mod.name) + 1:]
+            heading = s.anchor[len(mod.name) + 1 :]
             summary = s.summary if len(s.summary) <= 90 else s.summary[:87] + "..."
-            L.append(f"| {s.line} | [{s.name}](#{heading}) | {s.kind} | {s.status} | {summary} |")
+            L.append(
+                f"| {s.line} | [{s.name}](#{heading}) | {s.kind} | {s.status} | {summary} |"
+            )
         L.append("")
 
     if mod.internal_imports or mod.external_imports:
@@ -815,7 +983,10 @@ def write_module_page(out: Path, mod: Module, modules: dict[str, Module]) -> Non
         for t in sorted(mod.internal_imports):
             L.append(f"- [{t}]({t}.md)")
         if mod.external_imports:
-            L.append(f"- _external:_ " + ", ".join(f"`{e}`" for e in sorted(mod.external_imports)))
+            L.append(
+                f"- _external:_ "
+                + ", ".join(f"`{e}`" for e in sorted(mod.external_imports))
+            )
         L.append("")
     if mod.imported_by or mod.imported_by_tests:
         L += ["## Used by", ""]
@@ -827,7 +998,7 @@ def write_module_page(out: Path, mod: Module, modules: dict[str, Module]) -> Non
 
     L += ["## Symbols", ""]
     for s in mod.symbols:
-        heading = s.anchor[len(mod.name) + 1:]
+        heading = s.anchor[len(mod.name) + 1 :]
         L += [f"### {heading}", "", f"`{s.signature}`", ""]
         if s.summary:
             L += [s.summary, ""]
@@ -836,14 +1007,24 @@ def write_module_page(out: Path, mod: Module, modules: dict[str, Module]) -> Non
             facts.append("decorated: " + ", ".join(f"`@{d}`" for d in s.decorators))
         L += ["  ·  ".join(facts), ""]
         if s.calls:
-            L.append("**Calls:** " + ", ".join(
-                anchor_link(t, modules, mod.name) for t in sorted(s.calls)))
+            L.append(
+                "**Calls:** "
+                + ", ".join(anchor_link(t, modules, mod.name) for t in sorted(s.calls))
+            )
         if s.ambiguous_calls:
-            L.append("**Calls (ambiguous — name-matched only):** " + ", ".join(
-                anchor_link(t, modules, mod.name) for t in sorted(s.ambiguous_calls)))
+            L.append(
+                "**Calls (ambiguous — name-matched only):** "
+                + ", ".join(
+                    anchor_link(t, modules, mod.name) for t in sorted(s.ambiguous_calls)
+                )
+            )
         if s.called_by:
-            L.append("**Called by:** " + ", ".join(
-                anchor_link(t, modules, mod.name) for t in sorted(s.called_by)))
+            L.append(
+                "**Called by:** "
+                + ", ".join(
+                    anchor_link(t, modules, mod.name) for t in sorted(s.called_by)
+                )
+            )
         if s.called_by_tests:
             L.append(f"**Called by tests:** {len(s.called_by_tests)} test symbol(s)")
         if not (s.calls or s.called_by or s.ambiguous_calls or s.called_by_tests):
@@ -859,35 +1040,59 @@ def write_jsonl(out: Path, modules: dict[str, Module], include_tests: bool) -> N
         for m in sorted(modules.values(), key=lambda x: x.name):
             if m.is_test and not include_tests:
                 continue
-            f.write(json.dumps({
-                "kind": "module", "name": m.name, "path": m.path,
-                "doc_ref": f"modules/{m.doc_name}", "role": m.role,
-                "status": m.status, "lines": m.line_count,
-                "imports": sorted(m.internal_imports),
-                "imported_by": sorted(m.imported_by),
-                "imported_by_test_count": len(m.imported_by_tests),
-            }, ensure_ascii=False) + "\n")
+            f.write(
+                json.dumps(
+                    {
+                        "kind": "module",
+                        "name": m.name,
+                        "path": m.path,
+                        "doc_ref": f"modules/{m.doc_name}",
+                        "role": m.role,
+                        "status": m.status,
+                        "lines": m.line_count,
+                        "imports": sorted(m.internal_imports),
+                        "imported_by": sorted(m.imported_by),
+                        "imported_by_test_count": len(m.imported_by_tests),
+                    },
+                    ensure_ascii=False,
+                )
+                + "\n"
+            )
             for s in m.symbols:
-                f.write(json.dumps({
-                    "kind": s.kind, "anchor": s.anchor, "path": s.path, "line": s.line,
-                    "signature": s.signature, "summary": s.summary, "status": s.status,
-                    "calls": sorted(s.calls), "ambiguous_calls": sorted(s.ambiguous_calls),
-                    "called_by": sorted(s.called_by),
-                    "called_by_test_count": len(s.called_by_tests),
-                }, ensure_ascii=False) + "\n")
+                f.write(
+                    json.dumps(
+                        {
+                            "kind": s.kind,
+                            "anchor": s.anchor,
+                            "path": s.path,
+                            "line": s.line,
+                            "signature": s.signature,
+                            "summary": s.summary,
+                            "status": s.status,
+                            "calls": sorted(s.calls),
+                            "ambiguous_calls": sorted(s.ambiguous_calls),
+                            "called_by": sorted(s.called_by),
+                            "called_by_test_count": len(s.called_by_tests),
+                        },
+                        ensure_ascii=False,
+                    )
+                    + "\n"
+                )
 
 
 # --------------------------------------------------------------------------
+
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--repo", required=True, type=Path)
     ap.add_argument("--out", required=True, type=Path)
     ap.add_argument(
-        "--include-tests", action="store_true",
+        "--include-tests",
+        action="store_true",
         help="Also emit a page per test module. Off by default: tests are still parsed "
-             "(they're needed for the 'test-only' liveness signal), they just don't get "
-             "pages, because they swamp the graph and aren't what you're trying to read.",
+        "(they're needed for the 'test-only' liveness signal), they just don't get "
+        "pages, because they swamp the graph and aren't what you're trying to read.",
     )
     args = ap.parse_args()
 
@@ -919,11 +1124,16 @@ def main() -> int:
         if e.label.startswith("from ") or not e.anchor:
             continue
         slug = "flow-" + re.sub(r"[^a-z0-9]+", "-", e.label.lower()).strip("-") + ".md"
-        body = ["# Flow — `" + e.label + "`", "",
-                "[Start here](start-here.md)", "",
-                f"Call trace from {anchor_link(e.anchor, emitted, None)}, "
-                f"max depth {MAX_TRACE_DEPTH}, max {MAX_CHILDREN_PER_NODE} children shown per "
-                "step. Truncated on purpose — this is a route, not an inventory.", ""]
+        body = [
+            "# Flow — `" + e.label + "`",
+            "",
+            "[Start here](start-here.md)",
+            "",
+            f"Call trace from {anchor_link(e.anchor, emitted, None)}, "
+            f"max depth {MAX_TRACE_DEPTH}, max {MAX_CHILDREN_PER_NODE} children shown per "
+            "step. Truncated on purpose — this is a route, not an inventory.",
+            "",
+        ]
         body += build_trace(e.anchor, emitted)
         body += ["", "---", "", "[Start here](start-here.md)", ""]
         (out / slug).write_text("\n".join(body) + "\n", encoding="utf-8")
@@ -935,9 +1145,15 @@ def main() -> int:
         write_module_page(out, m, emitted)
     write_jsonl(out, emitted, args.include_tests)
 
-    print(f"{len(emitted)} module page(s), "
-          f"{sum(len(m.symbols) for m in emitted.values())} symbols -> {out}"
-          + (f"  ({test_count} test module(s) parsed but not written)" if not args.include_tests else ""))
+    print(
+        f"{len(emitted)} module page(s), "
+        f"{sum(len(m.symbols) for m in emitted.values())} symbols -> {out}"
+        + (
+            f"  ({test_count} test module(s) parsed but not written)"
+            if not args.include_tests
+            else ""
+        )
+    )
     return 0
 
 

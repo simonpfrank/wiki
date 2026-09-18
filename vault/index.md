@@ -13,6 +13,12 @@ for how this vault's own links are meant to work.
 ## wiki/
 
 - [wiki/decision-plain-markdown-links.md](wiki/decision-plain-markdown-links.md) — why plain relative Markdown links are used instead of Obsidian wikilinks.
+- [wiki/handover-codemap-orientation.md](wiki/handover-codemap-orientation.md) — session handover: the orientation experiments, graph-shape findings, and the excel-runner mockup awaiting a verdict.
+
+## codemaps/
+
+- [codemaps/_graph-experiments/README.md](codemaps/_graph-experiments/README.md) — three link topologies (chain / tree / hub) testing what Obsidian's graph view can show.
+- [codemaps/_mockup-excel-runner/start-here.md](codemaps/_mockup-excel-runner/start-here.md) — hand-built mockup of an ideal codemap, used to define the requirement.
 
 ## sources/
 
